@@ -1,0 +1,11 @@
+p_Rhad
+p_ptconecoreTrackPtrCorrection
+p_sigmad0
+p_Reta
+p_numberOfPixelHits
+p_numberOfInnermostPixelHits
+p_deltaEta1
+p_ambiguityType
+p_r33over37allcalo
+p_qOverP
+p_deltaPhiRescaled2

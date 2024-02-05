@@ -1,0 +1,67 @@
+I used both decision tree and neural network solutions for both the classification and regression problems, and tried out k-means++ and _______ for clustering.
+
+--Classification--
+
+1. Classification_SW_lgbm_clas.txt:
+	Algorithm: Scikit Learn LGBMClassifier:
+	Key HP Values: max_depth=27, min_samples_leaf=88, n_estimators=500
+	HP Optimisation: I used RandomSearchCV over 20 iterations to find the best HPs
+	Metrics:
+	- AUC Value on val_set = 0.974
+	- Accuracy score on val_set = 0.938
+	
+> I thought this model performed pretty well, where it gave a 0.94 accuracy on the validation test set, where I avoided overtraining using early_stopping. 
+
+2. Classification_SW_mlp_nn.txt:
+	Algorithm: Scikit Learn MLPClassifier:
+	Key HP Values: learning_rate_init=0.02, solver='adam', 
+	HP Optimisation: I used an adaptive learning rate to optimise the value, and used the adam solver to further optimise the learning rate.
+	AUC = 0.955
+	Accuracy: 0.914
+
+> This model didn't perform as well compared to the boosted decision tree one - I preprocessed the data for this one by standardising it - this seemed to have more of a positive effect on the accuracy and AUC on this model compared to the decision tree one.
+
+Variable Optimisation: I used Permutation Importance to find the most important variables for each model, and checked these variables by using permutation importance on different cuts and cross validating the results.
+
+
+--Regression--
+
+1. Regression_SW_lgbmreg.txt:
+	Algorithm: Scikit Learn LGBMRegressor
+	Key HP Values: max_depth=13, min_samples_leaf=35, n_estimators=1000
+	HP Optimisation: RandomSearchCV again, plus early_stopping to avoid overfitting 
+	Accuracy: 0.950
+
+> I thought this model performed very well on the validation set, but that may be due to the fact that the model was trained and validated on a set with only electrons present.
+
+2. Regression_SW_mlp_nn.txt:
+	Algorithm: Scikit Learn MLPRegressor
+	Key HP Values: learning_rate_init=0.02, solver='adam', hidden_layer_sizes=(20,20)
+	HP Optimisation: I used an adaptive learning rate again, and experimented with toggling the hidden layer sizes, as well as the initial learning rate to see how that changed the performance.
+	Accuracy: 0.910
+
+> This model didn't perform as well, I tried to use RandomSearchCV to optimise HPs but the performance was really slow, even after cutting the data for some reason. Preprocessing the data by using standardisation also helped, but using PCA decreased the accuracy however, and the test dataset was too large for KernelPCA to be used.
+
+Variable Optimisation: I used Permutation Importance again to find the most important variables for each model.
+
+--Clustering--
+
+1. Clustering_SW_kmeansv1.txt:
+	Algorithm: Scikit Learn KMeans++
+	Key HP Values: n_clusters=3
+	HP Optimisation: Used the elbow method to find the optimum number of clusters
+	Silhouette Score: 0.658
+
+> Used KMeans++ here, seems to cluster things reasonably. Looks like there's a lot of noise(?) around the main shape, which DBSCAN at least classifies as noise when I tested it (not used here as it doesn't scale well for large datasets, so wasn't able to use it for the main test data). Difference between v1 and v2 is the variable list used - different variables are ranked in importance before and after preprocessing, and I thought it would be interesting to see how the data clusters with each. It was hard to grasp any significance or meaning from looking at the clustering however. 
+
+2. Clustering_SW_kmeansv2.txt:
+	Algorithm: Scikit Learn KMeans++
+	Key HP Values: n_clusters=3
+	HP Optimisation: Used the elbow method to find the optimum number of clusters
+	Silhouette Score: 0.509
+	
+> There were definitely outliers using these variables. The data generally looks like one big clump, but used KMeans here to try and separate them out into clusters. At least with the shape of the data with v1's variable list, there seems to be more of a significant shape. It was generally hard to try and understand what each cluster corresponded to in the data.
+
+Variable Optimisation: I performed PCA on all the variables, and then took the components of the PCA (i.e. the variables) that contributed most to the output. Using this, I got two variable lists: one where this was performed before preprocessing (normalisation+standardisation), and one after.
+
+I tried DBSCAN, Agglomerative Clustering and MeanShift as well on smaller cuts of the data, but these started to produce major errors on my PC (long runtimes/memory leaks) when performed on the main dataset, so I did not include them.
